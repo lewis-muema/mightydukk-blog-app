@@ -1,19 +1,32 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from "react-native";
-import BlogContext from "../context/blogContext";
+import { Context } from "../context/blogContext";
+import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { AntDesign } from '@expo/vector-icons'; 
 
 const IndexScreen = () => {
-  const {data, addPost} = useContext(BlogContext);
-  const user = "Lewis";
+  const {state, addBlogPost, deleteBlogPost} = useContext(Context);
+  const navigation = useNavigation();
   return (
     <View>
       <View style={{marginHorizontal: 20}}>
-        <Button title="Add blog" onPress={addPost}></Button>
+        <TouchableOpacity style={styles.addPost} onPress={() => navigation.navigate('Create')}>
+          <Text style={styles.addPostText}>Add blog</Text>
+          <AntDesign name="pluscircleo" size={24} color="black" />
+        </TouchableOpacity>
         <FlatList
           showsHorizontalScrollIndicator={false}
-          data={data} 
+          data={state} 
           renderItem={({item}) =>
-            <Text style={styles.text}>{ item.title }</Text>
+            <View>
+              <TouchableOpacity style={styles.list} onPress={() => navigation.navigate('Show', { id: item.id })}>
+                <Text style={styles.text}>{ item.title }</Text>
+                <TouchableOpacity onPress={() => { deleteBlogPost(item.id) }}>
+                  <Feather name="trash" style={styles.trash} />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           }
         />
       </View>
@@ -25,6 +38,35 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     textAlign: "center"
+  },
+  list: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: "lightgrey",
+    borderWidth: 1,
+    flex: 1,
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    justifyContent: "space-between"
+  },
+  trash: {
+    fontSize: 18
+  },
+  addPost: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderColor: "lightgrey",
+    borderWidth: 1,
+    padding: 20,
+    alignItems: "center",
+    margin: 20,
+    borderRadius: 10,
+    backgroundColor: "white"
+  },
+  addPostText: {
+    fontSize: 18,
+    fontWeight: "600"
   }
 });
 
