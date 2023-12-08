@@ -7,7 +7,7 @@ const BlogForms = ({ id, type }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const navigation = useNavigation();
-  const {state, addBlogPost, editBlogPost} = useContext(Context);
+  const {state, addBlogPost, editBlogPost, getBlogPosts} = useContext(Context);
   const getBlog = () => {
     const blog = state.filter(blogPost => blogPost.id === id);
     return blog.length > 0 ? blog[0] : {title: "", content: ""};
@@ -23,8 +23,15 @@ const BlogForms = ({ id, type }) => {
     <Text style={styles.label}>Enter content</Text>
     <TextInput style={styles.input} value={content} onChangeText={(content) => setContent(content)} />
     <TouchableOpacity style={styles.saveContainer} onPress={() => {
-        type === "add" ? addBlogPost(title, content) : editBlogPost(id, title, content);
-        navigation.goBack()
+        type === "add" ?
+          addBlogPost(title, content, () => {
+            navigation.goBack();
+            getBlogPosts();
+          }) :
+          editBlogPost(id, title, content, () => {
+            navigation.goBack();
+            getBlogPosts();
+          });
       }
     }>
       <Text style={styles.save}>Save blog</Text>

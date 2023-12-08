@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from "react-native";
 import { Context } from "../context/blogContext";
 import { Feather } from "@expo/vector-icons";
@@ -6,8 +6,13 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from '@expo/vector-icons'; 
 
 const IndexScreen = () => {
-  const {state, addBlogPost, deleteBlogPost} = useContext(Context);
+  const {state, addBlogPost, deleteBlogPost, getBlogPosts} = useContext(Context);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    getBlogPosts();
+  }, []);
+
   return (
     <View>
       <View style={{marginHorizontal: 20}}>
@@ -22,7 +27,7 @@ const IndexScreen = () => {
             <View>
               <TouchableOpacity style={styles.list} onPress={() => navigation.navigate('Show', { id: item.id })}>
                 <Text style={styles.text}>{ item.title }</Text>
-                <TouchableOpacity onPress={() => { deleteBlogPost(item.id) }}>
+                <TouchableOpacity onPress={() => { deleteBlogPost(item.id, () => getBlogPosts()) }}>
                   <Feather name="trash" style={styles.trash} />
                 </TouchableOpacity>
               </TouchableOpacity>

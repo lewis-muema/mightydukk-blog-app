@@ -2,11 +2,18 @@
 /* eslint-disable import/no-named-as-default-member */
 /* eslint-disable import/no-named-as-default */
 import createDataContext from './createDataContext';
+import blogs from '../api/blogs';
 
 const blogReducer = (state, action) => {
   switch (action.type) {
+    case 'get_blogposts':
+      return action.payload;
     case 'add_post':
-      return [...state, { id: Math.floor(Math.random() * 99999), title: action.payload.title, content: action.payload.content }];
+      return [...state, {
+        id: Math.floor(Math.random() * 99999),
+        title: action.payload.title,
+        content: action.payload.content,
+      }];
     case 'edit_blogpost':
       return state.map(blogPost => (blogPost.id === action.payload.id ? action.payload : blogPost));
     case 'delete_blogpost':
@@ -16,18 +23,31 @@ const blogReducer = (state, action) => {
   }
 };
 
-const addBlogPost = dispatch => (title, content) => {
-  dispatch({ type: 'add_post', payload: { title, content } });
+const getBlogPosts = dispatch => () => {
+  blogs.get('/blogposts').then((res) => {
+    dispatch({ type: 'get_blogposts', payload: res.data });
+  });
 };
-const deleteBlogPost = dispatch => (id) => {
-  dispatch({ type: 'delete_blogpost', payload: id });
+const addBlogPost = () => (title, content, callback) => {
+  blogs.post('/blogposts', { title, content }).then(() => {
+    callback();
+  });
 };
-const editBlogPost = dispatch => (id, title, content) => {
-  dispatch({ type: 'edit_blogpost', payload: { id, title, content } });
+const deleteBlogPost = () => (id, callback) => {
+  blogs.delete(`/blogposts/${id}`).then(() => {
+    callback();
+  });
+};
+const editBlogPost = () => (id, title, content, callback) => {
+  blogs.put(`/blogposts/${id}`, { title, content }).then(() => {
+    callback();
+  });
 };
 
 export const { Context, Provider } = createDataContext(
   blogReducer,
-  { addBlogPost, deleteBlogPost, editBlogPost },
+  {
+    addBlogPost, deleteBlogPost, editBlogPost, getBlogPosts,
+  },
   [],
 );
