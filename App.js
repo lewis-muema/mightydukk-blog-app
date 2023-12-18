@@ -27,5 +27,5 @@ function App() {
 export default () => {
   return <Provider>
     <App />
-  </Provider>
+  </Provider>;
 };
